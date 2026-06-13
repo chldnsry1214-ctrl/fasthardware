@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <meta name="google-site-verification" content="Q6WaHe7AITW4zIMJLRVfKnoWt7uf0mBdva4cx7Dpco4" />
     <title>fasthardware | Hyper-Performance Python Acceleration Engine</title>
     <style>
@@ -113,14 +114,11 @@
             <span class="code-keyword">import</span> ungyoseries<br>
             <span class="code-keyword">import</span> time<br><br>
             
-            <span class="code-comment"># Initialize hyper-performance hardware environment at boot</span><br>
             ungyoseries.init(mode=<span class="code-string">"ULTIMATE"</span>)<br><br>
 
-            <span class="code-comment"># Start thread-isolated non-blocking high-speed video stream</span><br>
             vs = ungyoseries.fasthardware.FastVideoStream(src=<span class="code-string">0</span>).start()<br>
             time.sleep(<span class="code-string">1.0</span>)<br><br>
 
-            <span class="code-comment"># Bind automated workspace purging via optimization decorator</span><br>
             <span class="code-keyword">@ungyoseries.boost()</span><br>
             <span class="code-keyword">def</span> <span class="code-main">main_pipeline</span>():<br>
             &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">while True</span>:<br>
@@ -132,10 +130,8 @@
             <span class="code-keyword">from</span> fasthardware <span class="code-keyword">import</span> fasthardware<br>
             <span class="code-keyword">import</span> cv2<br><br>
 
-            <span class="code-comment"># Direct access to independent module optimization scripts</span><br>
             fasthardware.speedup(mode=<span class="code-string">"ULTIMATE"</span>)<br><br>
 
-            <span class="code-comment"># Custom buffer size configurations for extreme environments</span><br>
             stream = fasthardware.FastVideoStream(src=<span class="code-string">0</span>)<br>
             stream.start()<br><br>
 
@@ -180,7 +176,7 @@
                 document.getElementById("pkg-version").innerText = `ungyoseries v${latestVersion}`;
                 document.getElementById("install-cmd").innerText = `pip install ungyoseries==${latestVersion}`;
             } catch (error) {
-                console.warn("⚠️ [PyPI Sync Fallback] Using local milestone defaults:", error);
+                console.warn("⚠️ Using local milestone defaults:", error);
                 document.getElementById("pkg-version").innerText = "ungyoseries v26.6.13";
                 document.getElementById("mod-version").innerText = "fasthardware v2.2.3";
                 document.getElementById("install-cmd").innerText = "pip install ungyoseries==26.6.13";
