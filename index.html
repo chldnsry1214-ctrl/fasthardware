@@ -1,189 +1,853 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>fasthardware | Hyper-Performance Python Acceleration Engine</title>
-    <style>
-        :root {
-            --bg-color: #0b0f19;
-            --card-bg: #151b2c;
-            --accent-color: #00ff66;
-            --text-main: #ffffff;
-            --text-muted: #8f9cae;
-            --code-bg: #05070c;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fasthardware — Python 하드웨어 가속 라이브러리</title>
+  <meta name="description" content="fasthardware는 CUDA, OpenVINO, OpenCV를 한 줄로 최적화하는 Python 패키지입니다. GPU·CPU 성능을 즉시 극대화하세요." />
+  <meta name="keywords" content="fasthardware, python, CUDA, OpenVINO, OpenCV, 하드웨어 가속, 딥러닝 최적화" />
+  <meta name="robots" content="index, follow" />
 
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
-        }
+  <!-- Open Graph -->
+  <meta property="og:title" content="fasthardware — Python 하드웨어 가속 라이브러리" />
+  <meta property="og:description" content="CUDA, OpenVINO, OpenCV를 한 줄로 최적화하는 Python 패키지" />
+  <meta property="og:type" content="website" />
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 8%;
-            border-bottom: 1px solid #1e293b;
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
 
-        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; }
-        .logo span { color: var(--accent-color); }
-        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 25px; font-size: 0.95rem; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--accent-color); }
+  <style>
+    :root {
+      --bg:        #09090f;
+      --surface:   #111118;
+      --border:    #1e1e2e;
+      --accent:    #7c6af7;
+      --accent2:   #4fc3f7;
+      --green:     #57f287;
+      --yellow:    #f5d56e;
+      --red:       #f27a7a;
+      --text:      #e8e8f0;
+      --muted:     #6b6b82;
+      --code-bg:   #0d0d16;
+    }
 
-        .hero { text-align: center; padding: 80px 5% 40px 5%; max-width: 900px; margin: 0 auto; }
-        .badge-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-        
-        .badge { background: rgba(0, 255, 102, 0.1); color: var(--accent-color); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(0, 255, 102, 0.2); }
-        .badge.sub { background: rgba(255, 255, 255, 0.05); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.1); }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .hero h1 { font-size: 3.5rem; font-weight: 800; letter-spacing: -2px; margin: 0 0 20px 0; line-height: 1.1; }
-        .hero h1 span { background: linear-gradient(to right, #ffffff, #555555); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: 1.25rem; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto; }
+    html { scroll-behavior: smooth; }
 
-        .terminal { background: var(--code-bg); border: 1px solid #1e293b; border-radius: 12px; padding: 15px 25px; display: inline-flex; align-items: center; font-family: monospace; font-size: 1rem; margin-bottom: 40px; }
-        .terminal .prompt { color: var(--accent-color); margin-right: 12px; user-select: none; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
 
-        .usage-section { max-width: 900px; margin: 0 auto 80px auto; padding: 0 5%; }
-        .usage-section h2 { font-size: 2rem; font-weight: 700; border-left: 4px solid var(--accent-color); padding-left: 15px; margin-bottom: 20px; }
-        
-        .tab-container { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { background: #1e293b; color: var(--text-muted); border: 1px solid #334155; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .tab-btn.active { background: var(--accent-color); color: #000000; border-color: var(--accent-color); box-shadow: 0 4px 15px rgba(0, 255, 102, 0.3); }
-        
-        .code-block { background-color: var(--code-bg); border: 1px solid #1e293b; border-radius: 12px; padding: 25px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; color: #e2e8f0; text-align: left; box-shadow: inset 0 4px 20px rgba(0,0,0,0.4); display: none; }
-        .code-block.active { display: block; animation: fadeIn 0.4s ease; }
-        
-        .code-keyword { color: #ff79c6; }
-        .code-comment { color: #6272a4; font-style: italic; }
-        .code-string { color: #f1fa8c; }
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(124,106,247,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,106,247,.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* ── LAYOUT ── */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
 
-        footer { text-align: center; padding: 40px 0; border-top: 1px solid #1e293b; color: var(--text-muted); font-size: 0.85rem; }
-    </style>
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9,9,15,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+    }
+    nav .inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .nav-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -.5px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+      margin-left: auto;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 4px 12px;
+      background: rgba(124,106,247,.12);
+      border: 1px solid rgba(124,106,247,.3);
+      border-radius: 99px;
+      color: var(--accent);
+      margin-bottom: 28px;
+      letter-spacing: .5px;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+    .hero-install {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      color: var(--green);
+      margin-bottom: 48px;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+      position: relative;
+    }
+    .hero-install:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 24px rgba(124,106,247,.15);
+    }
+    .hero-install .copy-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Space Grotesk', sans-serif;
+      border-left: 1px solid var(--border);
+      padding-left: 12px;
+    }
+
+    /* ── STAT STRIP ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 96px;
+    }
+    .stat {
+      background: var(--surface);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── SECTIONS ── */
+    section { margin-bottom: 96px; }
+    .section-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .section-lead {
+      color: var(--muted);
+      max-width: 620px;
+      margin-bottom: 40px;
+    }
+
+    /* ── QUICK START STEPS ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 24px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(124,106,247,.12);
+      border: 1px solid rgba(124,106,247,.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .step p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+    }
+    .code-lang {
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+    }
+    .copy-btn {
+      font-size: 11px;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      transition: color .2s;
+      padding: 2px 6px;
+    }
+    .copy-btn:hover { color: var(--text); }
+    pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.75;
+    }
+    .kw  { color: #bd93f9; }
+    .fn  { color: #50fa7b; }
+    .st  { color: #f1fa8c; }
+    .cm  { color: #6272a4; font-style: italic; }
+    .nm  { color: #8be9fd; }
+    .op  { color: var(--accent2); }
+
+    /* ── API REFERENCE ── */
+    .api-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: border-color .2s;
+    }
+    .api-card:hover { border-color: rgba(124,106,247,.4); }
+    .api-card-header {
+      padding: 18px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      cursor: pointer;
+    }
+    .api-sig {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: var(--green);
+      flex: 1;
+    }
+    .api-sig .fn-name { color: var(--accent2); }
+    .api-tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .tag-func { background: rgba(87,242,135,.1); color: var(--green); border: 1px solid rgba(87,242,135,.2); }
+    .tag-class { background: rgba(79,195,247,.1); color: var(--accent2); border: 1px solid rgba(79,195,247,.2); }
+    .api-body {
+      padding: 0 22px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .api-body p {
+      color: var(--muted);
+      font-size: 14px;
+      padding-top: 16px;
+      margin-bottom: 14px;
+    }
+    .param-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .param-table th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 500;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .param-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(30,30,46,.5);
+      vertical-align: top;
+    }
+    .param-table tr:last-child td { border-bottom: none; }
+    .param-name { font-family: 'JetBrains Mono', monospace; color: var(--yellow); font-size: 13px; }
+    .param-type { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: 12px; }
+    .param-desc { color: var(--muted); }
+
+    /* ── DEVICE CARDS ── */
+    .device-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .device-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 20px;
+      transition: border-color .2s, transform .2s;
+    }
+    .device-card:hover {
+      border-color: rgba(124,106,247,.4);
+      transform: translateY(-2px);
+    }
+    .device-icon {
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+    .device-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .device-card p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .device-status {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .status-auto { background: rgba(87,242,135,.1); color: var(--green); border: 1px solid rgba(87,242,135,.2); }
+
+    /* ── TERMINAL DEMO ── */
+    .terminal {
+      background: #0a0a12;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,.02);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #f27a7a; }
+    .dot-y { background: #f5d56e; }
+    .dot-g { background: #57f287; }
+    .terminal-title {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-left: 8px;
+    }
+    .terminal-body {
+      padding: 20px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .t-prompt { color: var(--green); }
+    .t-cmd    { color: var(--text); }
+    .t-out    { color: var(--muted); }
+    .t-ok     { color: var(--green); }
+    .t-info   { color: var(--accent2); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      position: relative;
+      z-index: 1;
+    }
+    footer span { color: var(--accent); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .stats { grid-template-columns: 1fr; }
+      .device-grid { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.4rem; letter-spacing: -1.5px; }
+      nav .inner { gap: 16px; }
+      .nav-links { gap: 14px; }
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
-    <meta name="google-site-verification" content="Q6WaHe7AITW4zIMJLRVfKnoWt7uf0mBdva4cx7Dpco4" />
 <body>
 
-    <header>
-        <div class="logo">ungyoseries<span>.</span></div>
-        <div class="nav-links">
-            <a href="#usage">Usage Guide</a>
-            <a href="https://github.com" target="_blank">GitHub</a>
+<!-- NAV -->
+<nav>
+  <div class="inner">
+    <a class="nav-logo" href="#">fasthardware</a>
+    <ul class="nav-links">
+      <li><a href="#quickstart">시작하기</a></li>
+      <li><a href="#api">API</a></li>
+      <li><a href="#devices">지원 장치</a></li>
+      <li><a href="#examples">예제</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="container">
+  <section class="hero">
+    <div class="hero-badge">Python · CUDA · OpenVINO · OpenCV</div>
+    <h1>하드웨어를<br /><span>한 줄로 깨운다</span></h1>
+    <p class="hero-sub">
+      fasthardware는 GPU 우선순위 설정부터 멀티스레드 최적화, 카메라 스트림 레이턴시 제거까지 —
+      복잡한 설정을 단 한 번의 호출로 완료합니다.
+    </p>
+    <div class="hero-install" onclick="copyInstall(this)">
+      <span>pip install fasthardware</span>
+      <span class="copy-label">클릭하여 복사</span>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats reveal">
+    <div class="stat">
+      <span class="stat-num">3</span>
+      <span class="stat-label">가속 백엔드 자동 감지</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">1</span>
+      <span class="stat-label">함수 호출로 완전 최적화</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">0</span>
+      <span class="stat-label">프레임 드롭 (FastVideoStream)</span>
+    </div>
+  </div>
+
+  <!-- QUICK START -->
+  <section id="quickstart" class="reveal">
+    <p class="section-eyebrow">// 시작하기</p>
+    <h2>30초 퀵스타트</h2>
+    <p class="section-lead">설치 후 두 줄이면 충분합니다. fasthardware가 현재 환경을 스스로 감지하고 최적화합니다.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">01</div>
+        <div>
+          <h3>패키지 설치</h3>
+          <p>pip으로 설치합니다. CUDA, OpenVINO, OpenCV는 선택적으로 추가 설치하면 자동으로 활성화됩니다.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">bash</span>
+              <button class="copy-btn" onclick="copyCode(this)">복사</button>
+            </div>
+            <pre><span class="t-prompt">$</span> pip install fasthardware
+
+<span class="cm"># 딥러닝 추론을 사용한다면</span>
+<span class="t-prompt">$</span> pip install fasthardware torch openvino</pre>
+          </div>
         </div>
-    </header>
+      </div>
 
-    <section class="hero">
-        <div class="badge-container">
-            <div class="badge" id="pkg-version">Fetching PyPI...</div>
-            <div class="badge sub" id="mod-version">fasthardware v2.2.3</div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div>
+          <h3>speedup() 호출 — 끝</h3>
+          <p>프로그램 시작 시 단 한 번 호출하면, GPU 우선순위·스레드·cuDNN·OpenVINO 캐시가 모두 켜집니다.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">python</span>
+              <button class="copy-btn" onclick="copyCode(this)">복사</button>
+            </div>
+            <pre><span class="kw">import</span> fasthardware
+
+<span class="cm"># 기본 최적화</span>
+fasthardware.<span class="fn">speedup</span>()
+
+<span class="cm"># 멀티프로세싱 환경에서는 ULTIMATE 모드</span>
+fasthardware.<span class="fn">speedup</span>(<span class="st">"ULTIMATE"</span>)</pre>
+          </div>
         </div>
-        <h1>Bypass Python Bottlenecks.<br><span>Unlock Pure Hardware Power.</span></h1>
-        <p>ungyoseries.fasthardware runs your AI inference and real-time computer vision pipelines with zero blocking lag and automated runtime optimization.</p>
-        
-        <div class="terminal">
-            <span class="prompt">$</span>
-            <span id="install-cmd">pip install ungyoseries</span>
+      </div>
+
+      <div class="step">
+        <div class="step-num">03</div>
+        <div>
+          <h3>카메라 스트림 레이턴시 제거</h3>
+          <p>기본 cv2.VideoCapture는 버퍼 지연이 있습니다. FastVideoStream은 백그라운드 스레드로 항상 최신 프레임만 유지합니다.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">python</span>
+              <button class="copy-btn" onclick="copyCode(this)">복사</button>
+            </div>
+            <pre><span class="kw">from</span> fasthardware <span class="kw">import</span> <span class="nm">FastVideoStream</span>
+<span class="kw">import</span> cv2
+
+stream = <span class="nm">FastVideoStream</span>(src=<span class="op">0</span>).<span class="fn">start</span>()
+
+<span class="kw">while</span> <span class="op">True</span>:
+    frame = stream.<span class="fn">read</span>()         <span class="cm"># 항상 최신 프레임</span>
+    cv2.<span class="fn">imshow</span>(<span class="st">"Live"</span>, frame)
+    <span class="kw">if</span> cv2.<span class="fn">waitKey</span>(<span class="op">1</span>) == <span class="op">27</span>:
+        <span class="kw">break</span>
+
+stream.<span class="fn">stop</span>()
+cv2.<span class="fn">destroyAllWindows</span>()</pre>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <section class="usage-section" id="usage">
-        <h2>Quick Start & Usage</h2>
-        <p style="color: var(--text-muted); margin-bottom: 25px;">Toggle between package-level implementation and low-level module parameters.</p>
-        
-        <div class="tab-container">
-            <button class="tab-btn active" onclick="switchTab('ungyoseries-code', this)">ungyoseries Pipeline</button>
-            <button class="tab-btn" onclick="switchTab('fasthardware-code', this)">fasthardware Low-level</button>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div>
+          <h3>OpenVINO Core 꺼내 쓰기</h3>
+          <p>speedup() 이후에는 최적화 설정이 완료된 OpenVINO Core 싱글톤을 바로 꺼내 쓸 수 있습니다.</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">python</span>
+              <button class="copy-btn" onclick="copyCode(this)">복사</button>
+            </div>
+            <pre>fasthardware.<span class="fn">speedup</span>()
+
+core = fasthardware.<span class="fn">get_core</span>()   <span class="cm"># 최적화된 ov.Core 반환</span>
+model = core.<span class="fn">compile_model</span>(<span class="st">"model.xml"</span>, <span class="st">"AUTO"</span>)
+infer_request = model.<span class="fn">create_infer_request</span>()</pre>
+          </div>
         </div>
-        
-        <div id="ungyoseries-code" class="code-block active">
-            <span class="code-keyword">import</span> ungyoseries<br>
-            <span class="code-keyword">import</span> time<br><br>
-            
-            ungyoseries.init(mode=<span class="code-string">"ULTIMATE"</span>)<br><br>
+      </div>
 
-            vs = ungyoseries.fasthardware.FastVideoStream(src=<span class="code-string">0</span>).start()<br>
-            time.sleep(<span class="code-string">1.0</span>)<br><br>
+    </div>
+  </section>
 
-            <span class="code-keyword">@ungyoseries.boost()</span><br>
-            <span class="code-keyword">def</span> <span class="code-main">main_pipeline</span>():<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">while True</span>:<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;image = vs.read()<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">pass</span><br>
-        </div>
+  <!-- TERMINAL OUTPUT -->
+  <section class="reveal">
+    <p class="section-eyebrow">// 실행 출력</p>
+    <h2>실행하면 이렇게 보입니다</h2>
+    <p class="section-lead">speedup() 호출 시 감지된 하드웨어를 자동으로 출력합니다.</p>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="terminal-title">python main.py</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">❯</span> <span class="t-cmd">python main.py</span></div>
+        <div>&nbsp;</div>
+        <div class="t-info"> [FASTHARDWARE V2] Tuning mode: DEFAULT...</div>
+        <div class="t-ok">   -&gt; [CUDA] NVIDIA GeForce RTX 4060 detected. cuDNN benchmark + TF32 engaged.</div>
+        <div class="t-ok">   -&gt; [OpenVINO] CPU mode. THROUGHPUT hint engaged.</div>
+        <div class="t-ok">   -&gt; [OpenCV] SIMD + OpenCL acceleration engaged.</div>
+        <div class="t-info"> [FASTHARDWARE V2] System hardware optimization complete.</div>
+        <div>&nbsp;</div>
+        <div class="t-out"><span class="t-prompt">❯</span> <span class="t-out"># 이제 최적화된 상태로 코드가 실행됩니다</span></div>
+      </div>
+    </div>
+  </section>
 
-        <div id="fasthardware-code" class="code-block">
-            <span class="code-keyword">from</span> fasthardware <span class="code-keyword">import</span> fasthardware<br>
-            <span class="code-keyword">import</span> cv2<br><br>
+  <!-- DEVICES -->
+  <section id="devices" class="reveal">
+    <p class="section-eyebrow">// 지원 장치</p>
+    <h2>환경을 스스로 감지합니다</h2>
+    <p class="section-lead">CUDA, OpenVINO, OpenCV 중 설치된 것만 자동으로 활성화합니다. 없어도 에러 없이 건너뜁니다.</p>
+    <div class="device-grid">
+      <div class="device-card">
+        <div class="device-icon">🟢</div>
+        <h3>NVIDIA CUDA</h3>
+        <p>cuDNN benchmark 모드와 TF32 정밀도를 자동으로 켜 PyTorch 추론 속도를 극대화합니다.</p>
+        <span class="device-status status-auto">자동 감지</span>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">🔵</div>
+        <h3>Intel OpenVINO</h3>
+        <p>iGPU/CPU 모드 자동 선택, 모델 캐시 경로 설정, LATENCY/THROUGHPUT 힌트를 한 번에 처리합니다.</p>
+        <span class="device-status status-auto">자동 감지</span>
+      </div>
+      <div class="device-card">
+        <div class="device-icon">🟣</div>
+        <h3>OpenCV</h3>
+        <p>SIMD 최적화와 OpenCL 가속을 활성화하고, 가용한 전체 CPU 코어를 스레드에 할당합니다.</p>
+        <span class="device-status status-auto">자동 감지</span>
+      </div>
+    </div>
+  </section>
 
-            fasthardware.speedup(mode=<span class="code-string">"ULTIMATE"</span>)<br><br>
+  <!-- API REFERENCE -->
+  <section id="api" class="reveal">
+    <p class="section-eyebrow">// API 레퍼런스</p>
+    <h2>전체 API</h2>
+    <p class="section-lead">fasthardware의 모든 공개 함수와 클래스입니다.</p>
 
-            stream = fasthardware.FastVideoStream(src=<span class="code-string">0</span>)<br>
-            stream.start()<br><br>
+    <!-- speedup -->
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="api-sig"><span class="fn-name">speedup</span>(mode=<span style="color:var(--yellow)">"DEFAULT"</span>)</span>
+        <span class="api-tag tag-func">function</span>
+      </div>
+      <div class="api-body">
+        <p>시스템 전체 하드웨어 가속을 활성화합니다. 프로그램 시작 시 단 한 번 호출하세요. CUDA → OpenVINO → OpenCV 순으로 감지하여 최적화합니다.</p>
+        <table class="param-table">
+          <tr><th>파라미터</th><th>타입</th><th>설명</th></tr>
+          <tr>
+            <td><span class="param-name">mode</span></td>
+            <td><span class="param-type">str</span></td>
+            <td class="param-desc"><code style="color:var(--yellow);font-family:'JetBrains Mono',monospace;font-size:12px">"DEFAULT"</code> 또는 <code style="color:var(--yellow);font-family:'JetBrains Mono',monospace;font-size:12px">"ULTIMATE"</code>. ULTIMATE는 자식 프로세스에도 우선순위 및 CPU 코어 바인딩을 적용합니다.</td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-            <span class="code-keyword">try</span>:<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">while True</span>:<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;frame = stream.read()<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cv2.imshow(<span class="code-string">"Raw Engine Output"</span>, frame)<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> cv2.waitKey(<span class="code-string">1</span>) & 0xFF == <span class="code-keyword">ord</span>(<span class="code-string">'q'</span>): <span class="code-keyword">break</span><br>
-            <span class="code-keyword">finally</span>:<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;stream.stop()<br>
-            &nbsp;&nbsp;&nbsp;&nbsp;fasthardware.manual_sweep()<br>
-        </div>
-    </section>
+    <!-- get_core -->
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="api-sig"><span class="fn-name">get_core</span>() → <span style="color:var(--accent2)">ov.Core</span></span>
+        <span class="api-tag tag-func">function</span>
+      </div>
+      <div class="api-body">
+        <p>speedup() 호출로 생성된 OpenVINO Core 싱글톤을 반환합니다. speedup() 전에 호출하면 RuntimeError가 발생합니다. 모델을 컴파일할 때 이 Core를 재사용하면 초기화 오버헤드가 없습니다.</p>
+      </div>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 ungyoseries. Engineered exclusively by ungyo. All rights reserved.</p>
-    </footer>
+    <!-- manual_sweep -->
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="api-sig"><span class="fn-name">manual_sweep</span>()</span>
+        <span class="api-tag tag-func">function</span>
+      </div>
+      <div class="api-body">
+        <p>GC를 수동으로 실행하고 OS에 미사용 메모리를 즉시 반환합니다. speedup()은 GC 자동 수집을 비활성화하므로, 메모리를 해제하고 싶을 때 이 함수를 직접 호출하세요. Windows에서는 Working Set 크기를 트리밍하고, Linux에서는 malloc_trim을 호출합니다.</p>
+      </div>
+    </div>
 
-    <script>
-        function switchTab(blockId, element) {
-            const codeBlocks = document.querySelectorAll('.code-block');
-            codeBlocks.forEach(block => block.classList.remove('active'));
-            
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            
-            document.getElementById(blockId).classList.add('active');
-            element.classList.add('active');
-        }
+    <!-- FastVideoStream -->
+    <div class="api-card">
+      <div class="api-card-header">
+        <span class="api-sig"><span class="fn-name">FastVideoStream</span>(src=<span style="color:var(--op)">0</span>)</span>
+        <span class="api-tag tag-class">class</span>
+      </div>
+      <div class="api-body">
+        <p>백그라운드 스레드에서 카메라를 상시 읽어 최신 프레임만 유지하는 고성능 비디오 스트림입니다. 기본 cv2.VideoCapture의 버퍼 지연을 제거합니다. Windows에서 CAP_DSHOW 백엔드를 사용하며, 해상도는 640×480, 버퍼 크기 1로 고정됩니다.</p>
+        <table class="param-table">
+          <tr><th>메서드</th><th>설명</th></tr>
+          <tr><td><span class="param-name">.start()</span></td><td class="param-desc">백그라운드 스레드를 시작하고 self를 반환합니다. 체이닝 가능: <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2)">FastVideoStream(0).start()</code></td></tr>
+          <tr><td><span class="param-name">.read()</span></td><td class="param-desc">가장 최근 프레임(numpy ndarray)을 반환합니다.</td></tr>
+          <tr><td><span class="param-name">.stop()</span></td><td class="param-desc">스레드를 종료하고 카메라 리소스를 해제합니다.</td></tr>
+        </table>
+      </div>
+    </div>
 
-        async function fetchLatestPyPiVersion() {
-            const packageName = "ungyoseries"; 
-            const url = `https://pypi.org/pypi/${packageName}/json`;
+  </section>
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("Package not found");
-                
-                const data = await response.json();
-                const latestVersion = data.info.version;
+  <!-- EXAMPLES -->
+  <section id="examples" class="reveal">
+    <p class="section-eyebrow">// 예제</p>
+    <h2>실전 예제</h2>
+    <p class="section-lead">멀티프로세싱, 메모리 관리, OpenVINO 추론을 함께 쓰는 패턴입니다.</p>
 
-                document.getElementById("pkg-version").innerText = `ungyoseries v${latestVersion}`;
-                document.getElementById("install-cmd").innerText = `pip install ungyoseries==${latestVersion}`;
-            } catch (error) {
-                console.warn("⚠️ Using local milestone defaults:", error);
-                document.getElementById("pkg-version").innerText = "ungyoseries v26.6.13";
-                document.getElementById("mod-version").innerText = "fasthardware v2.2.3";
-                document.getElementById("install-cmd").innerText = "pip install ungyoseries==26.6.13";
-            }
-        }
+    <div class="code-block" style="margin-bottom:24px">
+      <div class="code-header">
+        <span class="code-lang">python — 딥러닝 추론 파이프라인</span>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+      </div>
+      <pre><span class="kw">import</span> fasthardware
+<span class="kw">from</span> fasthardware <span class="kw">import</span> <span class="nm">FastVideoStream</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
 
-        window.addEventListener('DOMContentLoaded', fetchLatestPyPiVersion);
-    </script>
+<span class="cm"># 1. 하드웨어 가속 최적화</span>
+fasthardware.<span class="fn">speedup</span>()
+
+<span class="cm"># 2. OpenVINO Core 및 모델 로드</span>
+core  = fasthardware.<span class="fn">get_core</span>()
+model = core.<span class="fn">compile_model</span>(<span class="st">"yolov8n.xml"</span>, <span class="st">"AUTO"</span>)
+infer = model.<span class="fn">create_infer_request</span>()
+
+<span class="cm"># 3. 카메라 스트림 시작</span>
+stream = <span class="nm">FastVideoStream</span>(src=<span class="op">0</span>).<span class="fn">start</span>()
+
+frame_count = <span class="op">0</span>
+<span class="kw">while</span> <span class="op">True</span>:
+    frame = stream.<span class="fn">read</span>()
+
+    <span class="cm"># 전처리 → 추론</span>
+    blob = np.<span class="fn">expand_dims</span>(frame, <span class="op">0</span>)
+    infer.<span class="fn">infer</span>({<span class="op">0</span>: blob})
+
+    frame_count += <span class="op">1</span>
+    <span class="kw">if</span> frame_count % <span class="op">500</span> == <span class="op">0</span>:
+        fasthardware.<span class="fn">manual_sweep</span>()  <span class="cm"># 주기적 메모리 정리</span></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">python — 멀티프로세싱 (ULTIMATE 모드)</span>
+        <button class="copy-btn" onclick="copyCode(this)">복사</button>
+      </div>
+      <pre><span class="kw">import</span> fasthardware
+<span class="kw">import</span> multiprocessing <span class="kw">as</span> mp
+
+<span class="kw">def</span> <span class="fn">worker</span>(idx):
+    <span class="fn">print</span>(<span class="st">f"Worker </span>{idx}<span class="st"> running"</span>)
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="cm"># 자식 프로세스까지 코어 바인딩 + 우선순위 상향</span>
+    fasthardware.<span class="fn">speedup</span>(<span class="st">"ULTIMATE"</span>)
+
+    pool = mp.<span class="nm">Pool</span>(<span class="fn">processes</span>=<span class="op">4</span>)
+    pool.<span class="fn">map</span>(worker, <span class="fn">range</span>(<span class="op">4</span>))
+    pool.<span class="fn">close</span>()</pre>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>fasthardware &mdash; <span>Python 하드웨어 가속 라이브러리</span></p>
+    <p style="margin-top:8px;font-size:12px">MIT License</p>
+  </div>
+</footer>
+
+<script>
+  // ── COPY INSTALL ──
+  function copyInstall(el) {
+    navigator.clipboard.writeText('pip install fasthardware').then(() => {
+      const label = el.querySelector('.copy-label');
+      label.textContent = '✓ 복사됨!';
+      setTimeout(() => label.textContent = '클릭하여 복사', 1500);
+    });
+  }
+
+  // ── COPY CODE BLOCK ──
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = '✓ 복사됨';
+      setTimeout(() => btn.textContent = '복사', 1500);
+    });
+  }
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>
